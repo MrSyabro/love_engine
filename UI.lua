@@ -3,24 +3,32 @@ local M = {}
 function M.new_button (name, x, y, w, h)
 	local button = M.new_element(name, x, y, w or 40, h or 160)
 	button.printed_name = name
-	button.colors = {}
-	button.colors.background = { 1, 1, 1, 1 }
-	button.colors.text = { 0, 0, 0, 1 }
+	button.color = {}
+	button.color.selected = {}
+	button.color.selected.background = { 1, 1, 1, 1 }
+	button.color.selected.text = { 0, 0, 0, 1 }
+	button.color.background = { 1, 1, 1, 1 }
+	button.color.text = { 0, 0, 0, 1 }
 
 	function button:load()
 		self.font = love.graphics.getFont()
-		self.text = love.graphics.newText(self.font, { self.colors.text, self.printed_name })
+		self.text = love.graphics.newText(self.font, { self.color.text, self.printed_name })
 		objs.mouse:register("pressed", button)
 		objs.mouse:register("released", button)
 	end
 
 	function button:draw()
-		love.graphics.setColor( self.colors.background )
+		local color = self.color
+		if self.selected then
+			color = self.color.selected
+		end
+		love.graphics.setColor( color.background )
 		love.graphics.polygon( "fill", 
 			self.pos.x, self.pos.y, 
 			self.pos.x + self.size.w, self.pos.y, 
 			self.pos.x + self.size.w, self.pos.y + self.size.h, 
 			self.pos.x, self.pos.y + self.size.h )
+		
 		love.graphics.draw(self.text, self.pos.x, self.pos.y)
 	end
 
@@ -31,7 +39,7 @@ function M.new_button (name, x, y, w, h)
 			if (tmp_x < self.size.w and tmp_x > 0) and (tmp_y < self.size.h and tmp_y > 0) then
 				objs:select_obj(self)
 				if self.callbacks.mousepressed then
-					self.callback.mousepressed(self)
+					self.callbacks.mousepressed(self)
 				end
 			end
 		end

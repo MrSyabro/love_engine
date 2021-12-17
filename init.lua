@@ -3,6 +3,10 @@ utf8 = require "utf8"
 local M = {}
 
 M.textinput = ""
+M.config = {}
+M.config.buffering = false
+M.buffers = {}
+M.buffers.count = true
 
 function M:init(love)
 	function love.load()
@@ -67,6 +71,7 @@ local function generate_scene()
 	S.touch.released = {}
 	S.touch.moved = {}
 	S.loaded = false
+	S.engine = M
 	setmetatable(S, meta)
 	
 	function S.keys:register (event, obj)
@@ -124,7 +129,10 @@ function M:load_scene(file_name)
 	self.current_scene:select_obj(self.current_scene[1])
 end
 
-function M:load()	
+function M:load()
+	self.buffers[true] = love.graphics.newCanvas(love.window.getWidth, love.window.getHeight)
+	self.buffers[false] = love.graphics.newCanvas(love.window.getWidth, love.window.getHeight)
+
 	for k, object in ipairs(self.current_scene) do
 		if object.load then
 			object:load()
@@ -142,10 +150,21 @@ function M:update(dt)
 end
 
 function M:draw()
+	if self.config.buffering then
+		love.graphics.setCanvas(self.buffers[self.buffers.count])
+		love.graphics.clear()
+	end
+
 	for k, object in ipairs(self.current_scene) do
 		if object.draw then
 			object:draw()
 		end
+	end
+
+	if self.config.buffering then
+		love.graphics.setCanvas()
+		love.graphics.draw(self.buffers[not self.buffers.count])
+		self.buffers.count = not self.buffers.count
 	end
 end
 
