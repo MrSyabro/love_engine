@@ -65,7 +65,6 @@ function M.generate_scene()
 	S.touch.released = {}
 	S.touch.moved = {}
 	S.loaded = false
-	S.engine = M
 	
 	return S
 end

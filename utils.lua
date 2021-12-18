@@ -1,12 +1,10 @@
 local m = {}
-m.coef = {}
-m.coef.w, m.coef.h = love.window.getMode()
 
-function m:tc(ux, uy)
-    return ux * self.coef.w, uy * self.coef.h
+function m.tc(ux, uy, w, h)
+    return ux * w, uy * h
 end
-function m:tu(cx, cy)
-    return cx / self.coef.w, cy / self.coef.h
+function m.tu(cx, cy, w, h)
+    return cx / w, cy / h
 end
 
 return m

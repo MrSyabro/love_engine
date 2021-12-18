@@ -1,3 +1,5 @@
+local u = require "love_engine.utils"
+
 local M = {}
 
 function M.new_button (name, x, y, w, h)
@@ -37,7 +39,7 @@ function M.new_button (name, x, y, w, h)
 			tmp_x = x - self.pos.x
 			tmp_y = y - self.pos.y
 			if (tmp_x < self.size.w and tmp_x > 0) and (tmp_y < self.size.h and tmp_y > 0) then
-				objs:select_obj(self)
+				objs:select(self)
 				if self.callbacks.mousepressed then
 					self.callbacks.mousepressed(self)
 				end
@@ -82,8 +84,8 @@ function M.new_textentry (name, x, y, w, h)
 			self.pos.x + self.size.w, self.pos.y, 
 			self.pos.x + self.size.w, self.pos.y + self.size.h, 
 			self.pos.x, self.pos.y + self.size.h )
-		love.graphics.print(self.printed_name, self.pos.x - 15, self.pos.y + 4)
-		love.graphics.print(self.textinput, self.pos.x + 5, self.pos.y + 4)
+		love.graphics.print(self.printed_name, self.pos.x + 1, self.pos.y - 11)
+		love.graphics.print(self.textinput, self.pos.x + 10, self.pos.y + 12)
 	end
 
 	function textentry:mousepressed (x, y, button, istouch, presses)
@@ -91,7 +93,7 @@ function M.new_textentry (name, x, y, w, h)
 			tmp_x = x - self.pos.x
 			tmp_y = y - self.pos.y
 			if (tmp_x < self.size.w and tmp_x > 0) and (tmp_y < self.size.h and tmp_y > 0) then
-				objs:select_obj(self)
+				objs:select(self)
 				if self.callbacks.mousepressed then
 					self.callback.mousepressed(self)
 				end
@@ -223,15 +225,6 @@ function M.new_element (name, x, y, h, w)
 	element.size.w = w
 
 	return element
-end
-
-function M.toPixels(x, y)
-	local nx, ny
-
-	nx = love.graphics.getHeight() / 900 * x
-	ny = love.graphics.getWidth() / 1600 * y
-
-	return nx, ny
 end
 
 return M
