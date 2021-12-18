@@ -6,8 +6,7 @@ local M = {}
 M.textinput = ""
 M.config = {}
 M.config.buffering = false
-M.buffers = {}
-M.buffers.count = true
+M.userdata = {}
 
 function M:init(love)
 	function love.load() self:load() end
