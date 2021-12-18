@@ -20,21 +20,16 @@ function M:init(love)
 		self:keyreleased(key, scancode)
 	end
 	function love.mousemoved( x, y, dx, dy, istouch )
-		local ux, uy = u:tu(x, y)
-		local udx, udy = u:tu(dx, dy)
-		self:mousemoved( ux, uy, udx, udy, istouch )
+		self:mousemoved( x, y, dx, dy, istouch )
 	end
 	function love.mousepressed( x, y, button, istouch, presses )
-		local ux, uy = u:tu(x, y)
-		self:mousepressed( ux, uy, button, istouch, presses )
+		self:mousepressed( x, y, button, istouch, presses )
 	end
 	function love.mousereleased( x, y, button, istouch, presses )
-		local ux, uy = u:tu(x, y)
-		self:mousereleased( ux, uy, button, istouch, presses )
+		self:mousereleased( x, y, button, istouch, presses )
 	end
 	function love.wheelmoved( x, y )
-		local ux, uy = u:tu(x, y)
-		self:wheelmoved( ux, uy )
+		self:wheelmoved( x, y )
 	end
 	function love.quit()
 		-- TODO: нормальное завершение программы
