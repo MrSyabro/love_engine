@@ -1,4 +1,4 @@
-utf8 = require "utf8"
+local utf8 = require "utf8"
 local u = require "love_engine.utils"
 local s = require "love_engine.scene"
 local M = {}
@@ -7,17 +7,6 @@ M.textinput = ""
 M.config = {}
 M.config.buffering = false
 M.userdata = {}
-M.error = function (err)
-	io.stderr:write(os.date("[%H:%M] ERROR: ")..err.."\n")
-end
-M.info = function (text)
-	io.stdout:write(os.date("[%H:%M] INFO: ")..text.."\n")
-end
-M.pcall_handle = function (stat, err)
-	if stat == false then
-		M.error (err)
-	end
-end
 
 function M:init(love)
 	function love.load() self:load() end
@@ -56,7 +45,9 @@ function M:load_scene(file_name)
 	env.objs = s.generate_scene()
 	env.engine = M
 	env.utils = u
-	assert(loadfile(file_name, "bt", env))()
+	local scene_func = u.error_handle(love.filesystem.load(file_name))
+	scene_func = setfenv(scene_func, env)
+	u.pcall(scene_func)
 	self.current_scene = env.objs
 	self.current_scene:select(self.current_scene[1])
 	self:load()
@@ -68,7 +59,7 @@ function M:load()
 	if not self.current_scene.loaded then
 		for k, object in ipairs(self.current_scene) do
 			if object.load then
-				M.pcall_handle(pcall(object.load, object))
+				u.pcall(object.load, object)
 			end
 		end
 		self.current_scene.loaded = true
@@ -78,7 +69,7 @@ end
 function M:update(dt)
 	for k, object in ipairs(self.current_scene) do
 		if object.update then
-			M.pcall_handle(pcall(object.update, object, dt))
+			u.pcall(object.update, object, dt)
 		end
 	end
 end
@@ -91,7 +82,7 @@ function M:draw()
 
 	for k, object in ipairs(self.current_scene) do
 		if object.draw then
-			M.pcall_handle(pcall(object.draw, object))
+			u.pcall(object.draw, object)
 		end
 	end
 
@@ -114,55 +105,55 @@ function M:keypressed(key, scancode, isrepeat)
 	end
 	
 	for k, obj in ipairs(self.current_scene.keys.pressed) do
-		M.pcall_handle(pcall(obj.keypressed, obj, scancode, isrepeat))
+		u.pcall(obj.keypressed, obj, scancode, isrepeat)
 	end
 end
 
 function M:keyreleased(key, scancode)
 	for k, obj in ipairs(self.current_scene.keys.released) do
-		M.pcall_handle(pcall(obj.keyreleased, obj, scancode))
+		u.pcall(obj.keyreleased, obj, scancode)
 	end
 end
 
 function M:mousemoved( x, y, dx, dy, istouch )
 	for k, obj in ipairs(self.current_scene.mouse.moved) do
-		M.pcall_handle(pcall(obj.mousemoved, obj, x, y, dx, dy, istouch))
+		u.pcall(obj.mousemoved, obj, x, y, dx, dy, istouch)
 	end
 end
 
 function M:mousepressed( x, y, button, istouch, presses )
 	for k, obj in ipairs(self.current_scene.mouse.pressed) do
-		M.pcall_handle(pcall(obj.mousepressed, obj, x, y, button, istouch, presses))
+		u.pcall(obj.mousepressed, obj, x, y, button, istouch, presses)
 	end
 end
 
 function M:mousereleased( x, y, button, istouch, presses )
 	for k, obj in ipairs(self.current_scene.mouse.released) do
-		M.pcall_handle(pcall(obj.mousereleased, obj, x, y, button, istouch, presses))
+		u.pcall(obj.mousereleased, obj, x, y, button, istouch, presses)
 	end
 end
 
 function M:wheelmoved( x, y )
 	for k, obj in ipairs(self.current_scene.mouse.wheel) do
-		M.pcall_handle(pcall(obj.wheelmoved, obj, x, y))
+		u.pcall(obj.wheelmoved, obj, x, y)
 	end
 end
 
 function M:touchmoved( x, y, dx, dy, istouch )
 	for k, obj in ipairs(self.current_scene.touch.move) do
-		M.pcall_handle(pcall(obj.touchmoved, obj, x ,y, dx, dy, istouch))
+		u.pcall(obj.touchmoved, obj, x ,y, dx, dy, istouch)
 	end
 end
 
 function M:touchpressed( x, y, button, istouch, presses )
 	for k, obj in ipairs(self.current_scene.touch.pressed) do
-		M.pcall_handle(pcall(obj.touchpressed, obj, x, y, button, istouch, presses))
+		u.pcall(obj.touchpressed, obj, x, y, button, istouch, presses)
 	end
 end
 
 function M:touchreleased( x, y, button, istouch, presses )
 	for k, obj in ipairs(self.current_scene.touch.released) do
-		M.pcall_handle(pcall(obj.touchreleased, obj, x, y, button, istouch, presses))
+		u.pcall(obj.touchreleased, obj, x, y, button, istouch, presses)
 	end
 end
 
