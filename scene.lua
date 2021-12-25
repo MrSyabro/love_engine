@@ -1,6 +1,8 @@
+local u = require "love_engine.utils"
 local M = {}
 
 local scene_functions = {}
+scene_functions["__t"] = "scene"
 function scene_functions.select (self, obj)
 	if type(obj) == "string" then
 		obj = self.find (obj)
@@ -31,7 +33,11 @@ function scene_functions.find (self, name)
 end
 function scene_functions.add(self, obj)
 	table.insert(self, obj)
-	if self.loaded then obj:load() end
+	obj.parent = self
+	if self.loaded and not obj.loaded then
+		u.pcall(obj.load, obj)
+		obj.loaded = true
+	end
 end
 function scene_functions.remove(self, obj)
 	if type(obj) == "number" then
@@ -65,7 +71,7 @@ function M.generate_scene()
 	S.touch.released = {}
 	S.touch.moved = {}
 	S.loaded = false
-	
+
 	return S
 end
 

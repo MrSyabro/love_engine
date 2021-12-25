@@ -58,9 +58,11 @@ function M:load()
 
 	if not self.current_scene.loaded then
 		for k, object in ipairs(self.current_scene) do
+			object.parent = self.current_scene
 			if object.load then
 				u.pcall(object.load, object)
 			end
+			object.loaded = true
 		end
 		self.current_scene.loaded = true
 	end
@@ -103,7 +105,7 @@ function M:keypressed(key, scancode, isrepeat)
 			self.current_scene.selected.textinput = string.sub(self.current_scene.selected.textinput, 1, byteoffset - 1)
 		end
 	end
-	
+
 	for k, obj in ipairs(self.current_scene.keys.pressed) do
 		u.pcall(obj.keypressed, obj, scancode, isrepeat)
 	end

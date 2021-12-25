@@ -3,7 +3,8 @@ local u = require "love_engine.utils"
 local M = {}
 
 function M.new_button (name, x, y, w, h)
-	local button = M.new_element(name, x, y, w or 40, h or 160)
+	local button = M.new_element(name, x or 0, y or 0, w or 40, h or 160)
+	button.__t = "button"
 	button.printed_name = name
 	button.color = {}
 	button.color.selected = {}
@@ -25,12 +26,12 @@ function M.new_button (name, x, y, w, h)
 			color = self.color.selected
 		end
 		love.graphics.setColor( color.background )
-		love.graphics.polygon( "fill", 
-			self.pos.x, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y + self.size.h, 
+		love.graphics.polygon( "fill",
+			self.pos.x, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y + self.size.h,
 			self.pos.x, self.pos.y + self.size.h )
-		
+
 		love.graphics.draw(self.text, self.pos.x, self.pos.y)
 	end
 
@@ -63,8 +64,8 @@ function M.new_button (name, x, y, w, h)
 end
 
 function M.new_textentry (name, x, y, w, h)
-	local textentry = M.new_element(name, x, y, w or 40, h or 160)
-	textentry.printed_name = name
+	local textentry = M.new_element(name, x or 0, y or 0, w or 40, h or 160)
+	textentry.__t = "textentry"
 	textentry.textinput = ""
 	textentry.color = { 1, 1, 1, 0.8 }
 	textentry.color.selected = { 1, 1, 1, 1 }
@@ -74,17 +75,16 @@ function M.new_textentry (name, x, y, w, h)
 	end
 
 	function textentry:draw()
-		if self.selected then 
+		if self.selected then
 			love.graphics.setColor( self.color.selected )
 		else
 			love.graphics.setColor( self.color )
 		end
-		love.graphics.polygon( "line", 
-			self.pos.x, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y + self.size.h, 
+		love.graphics.polygon( "line",
+			self.pos.x, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y + self.size.h,
 			self.pos.x, self.pos.y + self.size.h )
-		love.graphics.print(self.printed_name, self.pos.x + 1, self.pos.y - 11)
 		love.graphics.print(self.textinput, self.pos.x + 10, self.pos.y + 12)
 	end
 
@@ -105,7 +105,8 @@ function M.new_textentry (name, x, y, w, h)
 end
 
 function M.new_vertical_slider(name, x, y, state, w, h)
-	local slider = M.new_element(name, x, y, w or 160, h or 40)
+	local slider = M.new_element(name, x or 0, y or 0, w or 160, h or 40)
+	slider.__t = "v_slider"
 	slider.state = {}
 	slider.state.current = state or 0
 	slider.state.default = state or 0
@@ -130,18 +131,18 @@ function M.new_vertical_slider(name, x, y, state, w, h)
 		end
 
 		love.graphics.setColor( colors.border )
-		love.graphics.polygon( "line", 
-			self.pos.x, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y, 
-			self.pos.x + self.size.w, self.pos.y + self.size.h, 
-			self.pos.x, self.pos.y + self.size.h 
+		love.graphics.polygon( "line",
+			self.pos.x, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y,
+			self.pos.x + self.size.w, self.pos.y + self.size.h,
+			self.pos.x, self.pos.y + self.size.h
 		)
 
 		local q = 1 - self.state.current
-		local poly_verts = { 
-			self.pos.x + self.size.border, self.pos.y + self.size.border + self.size.h * q, 
-			self.pos.x + self.size.w - self.size.border, self.pos.y  + self.size.border + self.size.h * q, 
-			self.pos.x + self.size.w - self.size.border, self.pos.y + self.size.h - self.size.border, 
+		local poly_verts = {
+			self.pos.x + self.size.border, self.pos.y + self.size.border + self.size.h * q,
+			self.pos.x + self.size.w - self.size.border, self.pos.y  + self.size.border + self.size.h * q,
+			self.pos.x + self.size.w - self.size.border, self.pos.y + self.size.h - self.size.border,
 			self.pos.x + self.size.border, self.pos.y + self.size.h - self.size.border
 		}
 		love.graphics.setColor( colors )
@@ -195,15 +196,87 @@ function M.new_vertical_slider(name, x, y, state, w, h)
 			if self.callbacks.statechanged then
 				self.callbacks.statechanged(self)
 			end
-		end		
+		end
 	end
 
 	return slider
 end
 
+function M.new_grid(name, x, y, w, h, column, string)
+	local obj = M.new_element(name, x or 0, y or 0, h or 640, w or 640)
+	obj.__t = "grid"
+	obj.column = column or 3
+	obj.string = string or 3
+	obj.grid = {}
+	obj.grid.n = 0
+	for i = 1, obj.column do
+		obj.grid[i] = {}
+		obj.grid[i].n = 0
+	end
+
+	local function update (c, s)
+		local co = u.error_handle(obj.grid[c][s], ("element grid[%d][%d]=nil"):format(c, s))
+		co.size.h = obj.size.h / obj.string
+		co.size.w = obj.size.w / obj.column
+		co.pos.x = obj.pos.x + obj.size.w / obj.column * (c - 1)
+		co.pos.y = obj.pos.y + obj.size.h / obj.string * (s - 1)
+	end
+
+	local function update_all ()
+		for c = 1, obj.column do
+			for s = 1, obj.string do
+				update(c, s)
+			end
+		end
+	end
+
+	function obj:add(child_obj, column, string)
+		local c = column
+		local s = string
+		if self.grid[c][s] == nil then
+			self.grid[c][s] = child_obj
+			self.grid.n = self.grid.n + 1
+			self.grid[c].n = self.grid[c].n + 1
+			if self.loaded and not child_obj.loaded then
+				self.parent:add(co)
+				child_obj.parent = self
+			end
+			update (c, s)
+		end
+	end
+
+	function obj:load()
+		for c = 1, obj.column do
+			for s = 1, obj.string do
+				if obj.grid[c][s] ~= nil then
+					local co = obj.grid[c][s]
+					if not co.loaded then
+						self.parent:add(co)
+						co.parent = self
+					end
+					update(c, s)
+				end
+			end
+		end
+	end
+
+	return obj
+end
+
+function M.new_text(name, x, y, w, h)
+	local obj = M.new_element(name, x or 0, y or 0, w or 0, h or 0)
+	obj.printed_name = name
+	function obj:draw()
+		love.graphics.print(self.printed_name, self.pos.x, self.pos.y)
+	end
+
+	return obj
+end
+
 function M.new_object(name)
 	local obj = {}
 
+	obj.__t = "obj"
 	obj.name = name
 	obj.callbacks = {}
 
@@ -217,6 +290,7 @@ end
 function M.new_element (name, x, y, h, w)
 	local element = M.new_object(name)
 
+	element.__t = "element"
 	element.pos = {}
 	element.pos.x = x
 	element.pos.y = y
