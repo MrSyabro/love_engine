@@ -154,7 +154,7 @@ function M.new_vertical_slider(name, x, y, state, w, h)
 			local tmp_x = x - self.pos.x
 			local tmp_y = y - self.pos.y
 			if (tmp_x < self.size.w and tmp_x > 0) and (tmp_y < self.size.h and tmp_y > 0) then
-				objs:select_obj(self)
+				objs:select(self)
 				self.clicked = true
 				if self.callbacks.mousepressed then
 					self.callback.mousepressed(self)

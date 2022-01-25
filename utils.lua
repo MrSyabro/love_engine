@@ -1,5 +1,5 @@
 local m = {}
-local w, h = love.window.getMode()
+local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 local unpack = unpack or table.unpack
 
 function m.tc(ux, uy, _w, _h)
@@ -23,10 +23,10 @@ function m.error_handle (...)
 end
 
 m.error = function (err)
-	io.stderr:write(os.date("[%H:%M] ERROR: ")..err or "".."\n")
+	io.stderr:write(os.date("[%H:%M] ERROR: ")..(err or "").."\n")
 end
 m.info = function (text)
-	io.stdout:write(os.date("[%H:%M] INFO: ")..text or "".."\n")
+	io.stdout:write(os.date("[%H:%M] INFO: ")..(text or "").."\n")
 end
 m.pcall = function (...)
 	m.error_handle(pcall(...))
