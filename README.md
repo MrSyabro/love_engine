@@ -5,15 +5,17 @@
 ## Пример
 
 `main.lua`:
-```
+
+```lua
 e = require "love_engine"
 
 e:init(love)
 e:load_scene("menu.lua")
 ```
 
-`menu.lua`
-```
+`menu.lua`:
+
+```lua
 local ui = require "love_engine.UI"
 
 grid = ui.new_grid ("grid", 0, 0, utils.tc(1, 1))   -- Создаем grid на весь экран
